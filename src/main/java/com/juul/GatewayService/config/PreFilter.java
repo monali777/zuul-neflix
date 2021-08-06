@@ -1,0 +1,46 @@
+package com.juul.GatewayService.config;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.http.HttpStatus;
+
+import com.netflix.zuul.ZuulFilter;
+import com.netflix.zuul.context.RequestContext;
+
+public class PreFilter extends ZuulFilter {
+    @Override
+    public String filterType() {
+        return "pre";
+    }
+
+    @Override
+    public int filterOrder() {
+        return 1;
+    }
+
+    @Override
+    public boolean shouldFilter() {
+        return true;
+    }
+
+    @Override
+    public Object run() {
+    	
+        RequestContext ctx = RequestContext.getCurrentContext();
+        HttpServletRequest request = ctx.getRequest();
+        String path = request.getHeader("client-path");
+        if(!path.equals("ALTIMETRIK")) {
+        	
+        	 ctx.setSendZuulResponse(false);
+           
+             ctx.setResponseBody("Invalid Header");
+           
+             ctx.setResponseStatusCode(HttpStatus.SC_FORBIDDEN);
+           
+             System.out.println("Request Method : " + request.getMethod() + " Request URL : " + request.getRequestURL().toString());
+         }
+    
+       
+        return null;
+    }
+}
